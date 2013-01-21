@@ -1,14 +1,12 @@
-Swagger.Net
+DG Swagger.Net
 ===========
 
 Library to document the ASP.NET Web API using the Swagger specification
 
-Latest version: Pre-release 0.5.5
-
 Introduction
 ------------
 
-Swagger.Net will expose any apis the inherit from the ApiController in the new [ASP.NET Web API](http://www.asp.net/web-api).
+DG Swagger.Net will expose any apis the inherit from the ApiController in the new [ASP.NET Web API](http://www.asp.net/web-api).
 
 Swagger UI is included in the solution.  However, when using the NuGet package you will need to roll your own somewhere and just point your instance of [Swagger UI](https://github.com/wordnik/swagger-ui) at http://YOUR-URL:PORT/api/swagger to expose all of the APIs that you have built.  
 
@@ -48,7 +46,6 @@ Known Issues
 I'm hoping you will help me find and/or fix these.
 
 + The version of Swagger UI I have built in the /docs folder DOES NOT WORK in Internet Explorer.  :-(
-+ Models according to the swagger spec are not yet supported
 
 
 Other Thoughts

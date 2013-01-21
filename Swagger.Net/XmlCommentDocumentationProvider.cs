@@ -6,6 +6,9 @@ using System.Text.RegularExpressions;
 using System.Web.Http.Controllers;
 using System.Web.Http.Description;
 using System.Xml.XPath;
+using Swagger.Net.ResourceModels;
+using System.Collections.Generic;
+using System.Xml;
 
 namespace Swagger.Net
 {
@@ -85,6 +88,33 @@ namespace Swagger.Net
 
             return "No Documentation Found.";
         }
+
+		public virtual IList<ResourceApiOperationParameterErrorResponse> GetErrorResponses(HttpActionDescriptor actionDescriptor)
+		{
+			var result = new List<ResourceApiOperationParameterErrorResponse>();
+			var memberNode = GetMemberNode(actionDescriptor);
+		
+			if (memberNode != null)
+			{
+				var navigator = memberNode.Select("exception");
+
+				foreach (XPathNavigator n in navigator)
+				{
+					var errorResponse = new ResourceApiOperationParameterErrorResponse();
+					errorResponse.Code = n.GetAttribute("code", "");
+					errorResponse.Reason = n.GetAttribute("message", "");
+
+					if (String.IsNullOrEmpty(errorResponse.Reason))
+					{
+						errorResponse.Reason = n.GetAttribute("reason", "");
+					}
+
+					result.Add(errorResponse);
+				}
+			}
+
+			return result;
+		}
 
         public virtual string GetResponseClass(HttpActionDescriptor actionDescriptor)
         {
