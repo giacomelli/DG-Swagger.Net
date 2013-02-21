@@ -9,6 +9,7 @@ using System.Dynamic;
 using Newtonsoft.Json;
 using Swagger.Net.ResourceModels;
 using Swagger.Net.Helpers;
+using System.Configuration;
 
 namespace Swagger.Net
 {
@@ -42,10 +43,15 @@ namespace Swagger.Net
 		public static ResourceListing CreateResourceListing(HttpControllerContext controllerContext, bool includeResourcePath = false)
 		{
 			Uri uri = controllerContext.Request.RequestUri;
+			
+			var apiTargetAssemblyName = ConfigurationManager.AppSettings["Swagger:ApiTargetAssemblyName"];
+			Assembly assembly = String.IsNullOrEmpty(apiTargetAssemblyName) ? Assembly.GetCallingAssembly() : Assembly.Load(apiTargetAssemblyName);					
+			var apiVersion = assembly.GetName().Version.ToString();
 
 			ResourceListing rl = new ResourceListing()
 			{
-				apiVersion = Assembly.GetCallingAssembly().GetType().Assembly.GetName().Version.ToString(),
+								
+				apiVersion =  apiVersion,
 				swaggerVersion = SWAGGER_VERSION,
 				basePath = uri.GetLeftPart(UriPartial.Authority) + HttpRuntime.AppDomainAppVirtualPath.TrimEnd('/'),
 				apis = new List<ResourceApi>(),

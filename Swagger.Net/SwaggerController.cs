@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Web.Http;
 
@@ -21,21 +22,26 @@ namespace Swagger.Net
 
 			foreach (var api in GlobalConfiguration.Configuration.Services.GetApiExplorer().ApiDescriptions)
 			{
-				string controllerName = api.ActionDescriptor.ControllerDescriptor.ControllerName;
-				if (uniqueControllers.Contains(controllerName) ||
-					  controllerName.ToUpper().Equals(SwaggerGen.SWAGGER.ToUpper())) continue;
+				if (api.ActionDescriptor.ControllerDescriptor.ControllerType.GetCustomAttributes(typeof(SwaggerIgnoreAttribute), false).Length == 0)
+				{
+					string controllerName = api.ActionDescriptor.ControllerDescriptor.ControllerName;
+					if (uniqueControllers.Contains(controllerName) ||
+						  controllerName.ToUpper().Equals(SwaggerGen.SWAGGER.ToUpper())) continue;
 
-				uniqueControllers.Add(controllerName);
+					uniqueControllers.Add(controllerName);
 
-				ResourceApi rApi = SwaggerGen.CreateResourceApi(api);
-				r.apis.Add(rApi);
+					ResourceApi rApi = SwaggerGen.CreateResourceApi(api);
+					r.apis.Add(rApi);
 
-				// Model
-				foreach (var param in api.ParameterDescriptions)
-				{										
-					r.models.Add(SwaggerGen.CreateResourceModel(param));
+					// Model
+					foreach (var param in api.ParameterDescriptions)
+					{
+						r.models.Add(SwaggerGen.CreateResourceModel(param));
+					}
 				}
 			}
+
+			r.apis = r.apis.OrderBy(a => a.path).ToList();
 
 			HttpResponseMessage resp = new HttpResponseMessage();
 
