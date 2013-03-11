@@ -82,17 +82,26 @@ namespace Swagger.Net
 
 		public static ResourceModelNode CreateResourceModel(ApiParameterDescription param)
 		{
-			ResourceModelNode rModel = null;
-			var parameterType = param.ParameterDescriptor.ParameterType;
+			return CreateResourceModel(param.ParameterDescriptor.ParameterType);
+		}
 
-			if (!parameterType.IsValueType && !parameterType.Equals(typeof(string)))
+		public static ResourceModelNode CreateResourceModel(Type modelType)
+		{
+			ResourceModelNode rModel = null;
+		
+			if (!modelType.IsValueType && !modelType.Equals(typeof(string)))
 			{
+				if (modelType.IsGenericType)
+				{
+					modelType = modelType.GetGenericArguments().First();
+				}
+
 				rModel = new ResourceModelNode()
 				{
-					Id = parameterType.Name				
+					Id = modelType.Name				
 				};
 
-				foreach (var typeProperty in parameterType.GetProperties(BindingFlags.Public | BindingFlags.Instance))
+				foreach (var typeProperty in modelType.GetProperties(BindingFlags.Public | BindingFlags.Instance))
 				{
 					var property = new ResourceModelPropertyNode();
 					property.Id = typeProperty.Name;

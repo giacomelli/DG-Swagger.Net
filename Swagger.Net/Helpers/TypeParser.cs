@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections;
+using System.Globalization;
+using System.Linq;
 
 namespace Swagger.Net.Helpers
 {
@@ -46,6 +49,10 @@ namespace Swagger.Net.Helpers
 			{
 				result = s_typesMapping[type];
 			}
+			else if (type.IsGenericType && type.GetInterface("IEnumerable") != null)
+			{
+				result = String.Format(CultureInfo.InvariantCulture, "List[{0}]", type.GetGenericArguments().First().Name);
+			}
 
 			return result;
 		}
@@ -66,6 +73,10 @@ namespace Swagger.Net.Helpers
 			else if (type.StartsWith("IEnumerable<"))
 			{
 				result = type.Replace("IEnumerable<", "List[").Replace(">", "]");
+			}
+			else if (type.StartsWith("List<"))
+			{
+				result = type.Replace("List<", "List[").Replace(">", "]");
 			}
 
 			return result;

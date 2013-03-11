@@ -54,13 +54,17 @@ namespace Swagger.Net
 
 				// Make sure we only report the current controller docs
 				if (!apiControllerName.Equals(actionContext.ControllerContext.ControllerDescriptor.ControllerName))
+				{
 					continue;
+				}
 				
 				// Api
 				ResourceApi rApi = SwaggerGen.CreateResourceApi(api);
-				r.apis.Add(rApi);
+				r.apis.Add(rApi);				
 
 				ResourceApiOperation rApiOperation = SwaggerGen.CreateResourceApiOperation(api, docProvider);
+				var reflectedActionDescriptor = api.ActionDescriptor as ReflectedHttpActionDescriptor;			
+				r.models.Add(SwaggerGen.CreateResourceModel(reflectedActionDescriptor.MethodInfo.ReturnType));
 				rApi.operations.Add(rApiOperation);
 
 				foreach (var param in api.ParameterDescriptions)
