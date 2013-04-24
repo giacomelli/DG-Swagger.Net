@@ -59,6 +59,7 @@
   <ItemGroup>
     <Compile Include="ResourceModels\ResourceModelNodeCollectionBase.cs" />
     <Compile Include="ResourceModels\ResourceModelNodeBase.cs" />
+    <Compile Include="ResourceModels\ResourceModelPropertyAllowableValuesNode.cs" />
     <Compile Include="Serialization\SwaggerContractResolver.cs" />
     <Compile Include="Helpers\TypeParser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

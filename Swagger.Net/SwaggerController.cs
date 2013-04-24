@@ -36,7 +36,7 @@ namespace Swagger.Net
 					// Model
 					foreach (var param in api.ParameterDescriptions)
 					{
-						r.models.Add(SwaggerGen.CreateResourceModel(param));
+						r.models.Add(SwaggerGen.CreateResourceModel(param, docProvider));
 					}
 				}
 			}

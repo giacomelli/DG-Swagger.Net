@@ -53,6 +53,10 @@ namespace Swagger.Net.Helpers
 			{
 				result = String.Format(CultureInfo.InvariantCulture, "List[{0}]", type.GetGenericArguments().First().Name);
 			}
+			else if (result.EndsWith("[]", StringComparison.OrdinalIgnoreCase))
+			{
+				result = String.Format(CultureInfo.InvariantCulture, "List[{0}]", result.Replace("[]", ""));
+			}
 
 			return result;
 		}

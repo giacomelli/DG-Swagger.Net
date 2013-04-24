@@ -29,13 +29,16 @@ namespace Swagger.Net
 		public virtual string GetDocumentation(HttpParameterDescriptor parameterDescriptor)
 		{
 			ReflectedHttpParameterDescriptor reflectedParameterDescriptor = parameterDescriptor as ReflectedHttpParameterDescriptor;
+			
 			if (reflectedParameterDescriptor != null)
 			{
 				XPathNavigator memberNode = GetMemberNode(reflectedParameterDescriptor.ActionDescriptor);
+				
 				if (memberNode != null)
 				{
 					string parameterName = reflectedParameterDescriptor.ParameterInfo.Name;
 					XPathNavigator parameterNode = memberNode.SelectSingleNode(string.Format("param[@name='{0}']", parameterName));
+				
 					if (parameterNode != null)
 					{
 						return parameterNode.Value.Trim();

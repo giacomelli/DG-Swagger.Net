@@ -14,7 +14,7 @@ namespace Swagger.Net.Serialization
 		private ResourceListing m_resourceListing;
 		#endregion
 
-		#region Constructors	
+		#region Constructors
 		/// <summary>
 		/// Initializes a new <see cref="SwaggerContractResolver"/> class instance.
 		/// <param name="resourceListing">The API resource listing.</param>
