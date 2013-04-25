@@ -7,6 +7,8 @@ using System.Text.RegularExpressions;
 using System.Web.Http.Controllers;
 using System.Web.Http.Description;
 using System.Xml.XPath;
+using DocsByReflection;
+using System.Xml;
 
 namespace Swagger.Net
 {
@@ -16,6 +18,10 @@ namespace Swagger.Net
 	/// </summary>
 	public class XmlCommentDocumentationProvider : IDocumentationProvider
 	{
+		#region Constants
+		private const string NoDocumentionFoundMark = "No Documentation Found.";
+		#endregion
+
 		XPathNavigator _documentNavigator;
 		private const string _methodExpression = "/doc/members/member[@name='M:{0}']";
 		private static Regex nullableTypeNameRegex = new Regex(@"(.*\.Nullable)" + Regex.Escape("`1[[") + "([^,]*),.*");
@@ -28,30 +34,26 @@ namespace Swagger.Net
 
 		public virtual string GetDocumentation(HttpParameterDescriptor parameterDescriptor)
 		{
-			ReflectedHttpParameterDescriptor reflectedParameterDescriptor = parameterDescriptor as ReflectedHttpParameterDescriptor;
-			
+			var result = NoDocumentionFoundMark;
+			var reflectedParameterDescriptor = parameterDescriptor as ReflectedHttpParameterDescriptor;
+
 			if (reflectedParameterDescriptor != null)
 			{
-				XPathNavigator memberNode = GetMemberNode(reflectedParameterDescriptor.ActionDescriptor);
-				
-				if (memberNode != null)
+				var doc =  DocsService.GetXmlFromParameter(reflectedParameterDescriptor.ParameterInfo);
+
+				if (doc != null)
 				{
-					string parameterName = reflectedParameterDescriptor.ParameterInfo.Name;
-					XPathNavigator parameterNode = memberNode.SelectSingleNode(string.Format("param[@name='{0}']", parameterName));
-				
-					if (parameterNode != null)
-					{
-						return parameterNode.Value.Trim();
-					}
+					result = doc.InnerText;
 				}
 			}
 
-			return "No Documentation Found.";
+			return result;
 		}
 
 		public virtual bool GetRequired(HttpParameterDescriptor parameterDescriptor)
 		{
 			ReflectedHttpParameterDescriptor reflectedParameterDescriptor = parameterDescriptor as ReflectedHttpParameterDescriptor;
+		
 			if (reflectedParameterDescriptor != null)
 			{
 				return !reflectedParameterDescriptor.ParameterInfo.IsOptional;
@@ -60,34 +62,43 @@ namespace Swagger.Net
 			return true;
 		}
 
-		public virtual string GetDocumentation(HttpActionDescriptor actionDescriptor)
+		private XmlElement GetDocElement(HttpActionDescriptor actionDescriptor)
 		{
-			XPathNavigator memberNode = GetMemberNode(actionDescriptor);
-			if (memberNode != null)
+			XmlElement result = null;
+			var reflected = actionDescriptor as ReflectedHttpActionDescriptor;
+
+			if (!reflected.MethodInfo.DeclaringType.Equals(typeof(SwaggerController)))
 			{
-				XPathNavigator summaryNode = memberNode.SelectSingleNode("summary");
-				if (summaryNode != null)
-				{
-					return summaryNode.Value.Trim();
-				}
+				return DocsService.GetXmlFromMember(reflected.MethodInfo);
 			}
 
-			return "No Documentation Found.";
+			return result;
+		}
+
+		public virtual string GetDocumentation(HttpActionDescriptor actionDescriptor)
+		{
+			var result = NoDocumentionFoundMark;
+			var doc = GetDocElement(actionDescriptor);
+
+			if (doc != null)
+			{
+				result = doc.SelectSingleNode("summary").InnerText;
+			}
+
+			return result;
 		}
 
 		public virtual string GetNotes(HttpActionDescriptor actionDescriptor)
 		{
-			XPathNavigator memberNode = GetMemberNode(actionDescriptor);
-			if (memberNode != null)
+			var result = NoDocumentionFoundMark;
+			var doc = GetDocElement(actionDescriptor);
+
+			if (doc != null)
 			{
-				XPathNavigator summaryNode = memberNode.SelectSingleNode("remarks");
-				if (summaryNode != null)
-				{
-					return summaryNode.Value.Trim();
-				}
+				result = doc.SelectSingleNode("remarks").InnerText;
 			}
 
-			return "No Documentation Found.";
+			return result;
 		}
 
 		public virtual IList<ResourceApiOperationParameterErrorResponse> GetErrorResponses(HttpActionDescriptor actionDescriptor)

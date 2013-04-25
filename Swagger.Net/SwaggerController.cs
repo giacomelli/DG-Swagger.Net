@@ -5,6 +5,9 @@ using System.Web.Http;
 
 namespace Swagger.Net
 {
+	/// <summary>
+	/// Swagger controller.
+	/// </summary>
 	public class SwaggerController : ApiController
 	{
 		/// <summary>
