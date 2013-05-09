@@ -60,6 +60,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Helpers\CustomAttributeHelper.cs" />
+    <Compile Include="ResourceListing.cs" />
     <Compile Include="ResourceModels\ResourceModelNodeCollectionBase.cs" />
     <Compile Include="ResourceModels\ResourceModelNodeBase.cs" />
     <Compile Include="ResourceModels\ResourceModelPropertyAllowableValuesNode.cs" />
@@ -74,6 +76,7 @@
     <Compile Include="SwaggerModels.cs" />
     <Compile Include="SwaggerActionFilter.cs" />
     <Compile Include="SwaggerController.cs" />
+    <Compile Include="SwaggerOptionsAttribute.cs" />
     <Compile Include="XmlCommentDocumentationProvider.cs" />
   </ItemGroup>
   <ItemGroup>

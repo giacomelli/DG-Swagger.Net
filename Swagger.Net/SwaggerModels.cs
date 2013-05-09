@@ -66,16 +66,15 @@ namespace Swagger.Net
 			ResourceListing rl = new ResourceListing()
 			{
 								
-				apiVersion =  s_apiVersion,
-				swaggerVersion = SWAGGER_VERSION,
-				basePath = uri.GetLeftPart(UriPartial.Authority) + HttpRuntime.AppDomainAppVirtualPath.TrimEnd('/'),
-				apis = new List<ResourceApi>(),
-				models = new ResourceModelNodeCollection()
+				ApiVersion =  s_apiVersion,
+				SwaggerVersion = SWAGGER_VERSION,
+				BasePath = uri.GetLeftPart(UriPartial.Authority) + HttpRuntime.AppDomainAppVirtualPath.TrimEnd('/'),				
+				Models = new ResourceModelNodeCollection()
 			};
 
 			if (includeResourcePath)
 			{
-				rl.resourcePath = controllerContext.ControllerDescriptor.ControllerName; 
+				rl.ResourcePath = controllerContext.ControllerDescriptor.ControllerName; 
 			}
 
 			return rl;
@@ -94,6 +93,8 @@ namespace Swagger.Net
 				description = api.Documentation,
 				operations = new List<ResourceApiOperation>()
 			};
+
+			CustomAttributeHelper.PrepareByOptionAttribute(rApi, api.ActionDescriptor);
 
 			return rApi;
 		}
@@ -117,33 +118,13 @@ namespace Swagger.Net
 			lock (s_lock)
 			{				
 				ResourceModelNode rModel = null;
-
-				//if (modelType.IsEnum)
-				//{
-				//    if (s_cache.ContainsKey(modelType))
-				//    {
-				//        return s_cache[modelType];
-				//    }
-
-				//    rModel = new ResourceModelNode()
-				//    {
-				//        Id = modelType.Name
-				//    };
-
-				//    var property = new ResourceModelPropertyNode();
-				//    property.Id = "type";
-				//    property.Type = "string";
-
-				//    //property.AllowableValues = CreateAllowableValues(modelType);
-
-				//    rModel.Properties.Add(property);
-				//}
-				//else 
+			
 				if ((!modelType.IsValueType && !modelType.Equals(typeof(string))))
 				{
 					if (modelType.IsGenericType)
 					{
 						modelType = modelType.GetGenericArguments().First();
+						return CreateResourceModel(param, modelType, docProvider);
 					}
 
 					if (s_cache.ContainsKey(modelType))
@@ -228,6 +209,7 @@ namespace Swagger.Net
 		public static ResourceApiOperationParameter CreateResourceApiOperationParameter(ApiDescription api, ApiParameterDescription param, XmlCommentDocumentationProvider docProvider)
 		{
 			string paramType = (param.Source.ToString().Equals(FROMURI)) ? QUERY : BODY;
+
 			var parameter = new ResourceApiOperationParameter()
 			{
 				paramType = (paramType == "query" && api.RelativePath.IndexOf("{" + param.Name + "}") > -1) ? PATH : paramType,
@@ -240,19 +222,11 @@ namespace Swagger.Net
 			parameter.allowMultiple = parameter.dataType.StartsWith("List[");
 			parameter.allowableValues = CreateAllowableValues(param.ParameterDescriptor.ParameterType);
 
+			CustomAttributeHelper.PrepareByOptionAttribute(parameter, param.ParameterDescriptor);
+
 			return parameter;
 		}		
-	}
-
-	public class ResourceListing
-	{
-		public string apiVersion { get; set; }
-		public string swaggerVersion { get; set; }
-		public string basePath { get; set; }
-		public string resourcePath { get; set; }
-		public List<ResourceApi> apis { get; set; }
-		public ResourceModelNodeCollection models { get; set; }
-	}
+	}	
 
 	public class ResourceApi
 	{

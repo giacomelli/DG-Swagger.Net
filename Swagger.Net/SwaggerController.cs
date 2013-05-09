@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Net.Http;
 using System.Web.Http;
+using Swagger.Net.Helpers;
 
 namespace Swagger.Net
 {
@@ -25,7 +26,7 @@ namespace Swagger.Net
 
 			foreach (var api in GlobalConfiguration.Configuration.Services.GetApiExplorer().ApiDescriptions)
 			{
-				if (api.ActionDescriptor.ControllerDescriptor.ControllerType.GetCustomAttributes(typeof(SwaggerIgnoreAttribute), false).Length == 0)
+				if (!CustomAttributeHelper.HasIgnoreAttribute(api.ActionDescriptor.ControllerDescriptor))
 				{
 					string controllerName = api.ActionDescriptor.ControllerDescriptor.ControllerName;
 					if (uniqueControllers.Contains(controllerName) ||
@@ -34,17 +35,15 @@ namespace Swagger.Net
 					uniqueControllers.Add(controllerName);
 
 					ResourceApi rApi = SwaggerGen.CreateResourceApi(api);
-					r.apis.Add(rApi);
+					r.AddApi(rApi);
 
 					// Model
 					foreach (var param in api.ParameterDescriptions)
 					{
-						r.models.Add(SwaggerGen.CreateResourceModel(param, docProvider));
+						r.Models.Add(SwaggerGen.CreateResourceModel(param, docProvider));
 					}
 				}
 			}
-
-			r.apis = r.apis.OrderBy(a => a.path).ToList();
 
 			HttpResponseMessage resp = new HttpResponseMessage();
 

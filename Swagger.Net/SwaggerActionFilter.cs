@@ -9,6 +9,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System;
 using System.Threading.Tasks;
+using Swagger.Net.Helpers;
 
 namespace Swagger.Net
 {
@@ -93,13 +94,13 @@ namespace Swagger.Net
 			foreach(var api in apis)
 			{
 				var resourceApi = SwaggerGen.CreateResourceApi(api);
-				resourceListing.apis.Add(resourceApi);
+				resourceListing.AddApi(resourceApi);
 				ResourceApiOperation resourceApiOperation = null;
 
 				Parallel.Invoke(
 				() =>
 				{
-					if (api.ActionDescriptor.GetCustomAttributes<SwaggerIgnoreAttribute>().Count == 0)
+					if (!CustomAttributeHelper.HasIgnoreAttribute(api.ActionDescriptor))
 					{
 						resourceApiOperation = SwaggerGen.CreateResourceApiOperation(api, DocProvider);
 						resourceApi.operations.Add(resourceApiOperation);
@@ -108,18 +109,18 @@ namespace Swagger.Net
 				() =>
 				{
 					var reflectedActionDescriptor = api.ActionDescriptor as ReflectedHttpActionDescriptor;
-					resourceListing.models.Add(SwaggerGen.CreateResourceModel(reflectedActionDescriptor.MethodInfo.ReturnType));
+					resourceListing.Models.Add(SwaggerGen.CreateResourceModel(reflectedActionDescriptor.MethodInfo.ReturnType));
 				});
 
 
 				foreach (var param in api.ParameterDescriptions)
-				{
+				{					
 					ResourceApiOperationParameter parameter = SwaggerGen.CreateResourceApiOperationParameter(api, param, DocProvider);
 					resourceApiOperation.parameters.Add(parameter);
-					resourceListing.models.Add(SwaggerGen.CreateResourceModel(param, DocProvider));
+					resourceListing.Models.Add(SwaggerGen.CreateResourceModel(param, DocProvider));
 				}
-			}			
-			
+			}
+
 			return resourceListing;
 		}
 	}

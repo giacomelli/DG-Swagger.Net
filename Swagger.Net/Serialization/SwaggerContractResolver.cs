@@ -33,7 +33,7 @@ namespace Swagger.Net.Serialization
 		/// </returns>
 		protected override string ResolvePropertyName(string propertyName)
 		{
-			if (m_resourceListing.models.GetDynamicMemberNames().Contains(propertyName))
+			if (m_resourceListing.Models.GetDynamicMemberNames().Contains(propertyName))
 			{
 				return propertyName;
 			}

@@ -95,7 +95,12 @@ namespace Swagger.Net
 
 			if (doc != null)
 			{
-				result = doc.SelectSingleNode("remarks").InnerText;
+				var remarksNode = doc.SelectSingleNode("remarks");
+
+				if (remarksNode != null)
+				{
+					result = remarksNode.InnerText;
+				}
 			}
 
 			return result;
