@@ -10,13 +10,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{7B0432
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{5A601AE5-8D12-48EE-9565-D8FCCC3CD936}"
-	ProjectSection(SolutionItems) = preProject
-		Local.testsettings = Local.testsettings
-		Swagger.Net.vsmdi = Swagger.Net.vsmdi
-		TraceAndTestImpact.testsettings = TraceAndTestImpact.testsettings
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Swagger.Net.UnitTests", "Swagger.Net.UnitTests\Swagger.Net.UnitTests.csproj", "{CE315C07-BAED-4F02-A1B4-F8C365088B15}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Swagger.Net.WebApi", "Swagger.Net.WebAPI\Swagger.Net.WebApi.csproj", "{9598BE25-C0E5-4C40-9926-B11BB757211F}"
