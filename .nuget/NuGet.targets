@@ -45,7 +45,8 @@
         <NuGetCommand Condition=" '$(OS)' == 'Windows_NT'">"$(NuGetExePath)"</NuGetCommand>
         <NuGetCommand Condition=" '$(OS)' != 'Windows_NT' ">mono --runtime=v4.0.30319 $(NuGetExePath)</NuGetCommand>
 
-        <PackageOutputDir Condition="$(PackageOutputDir) == ''">$(SolutionDir.Trim('\\'))\packages</PackageOutputDir>
+        <PackageOutputDir Condition="$(PackageOutputDir) == '' AND '$(OS)' == 'Windows_NT'">$(SolutionDir.Trim('\\'))\packages</PackageOutputDir>
+        <PackageOutputDir Condition="$(PackageOutputDir) == '' AND '$(OS)' != 'Windows_NT'">$(SolutionDir)\packages</PackageOutputDir>
         
         <RequireConsentSwitch Condition=" $(RequireRestoreConsent) == 'true' ">-RequireConsent</RequireConsentSwitch>
         <!-- Commands -->
