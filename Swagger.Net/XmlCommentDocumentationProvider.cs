@@ -9,6 +9,7 @@ using System.Web.Http.Description;
 using System.Xml.XPath;
 using DocsByReflection;
 using System.Xml;
+using Swagger.Net.ResourceModels.Configuration;
 
 namespace Swagger.Net
 {
@@ -39,7 +40,7 @@ namespace Swagger.Net
 
 			if (reflectedParameterDescriptor != null)
 			{
-				var doc =  DocsService.GetXmlFromParameter(reflectedParameterDescriptor.ParameterInfo);
+				var doc =  DocsService.GetXmlFromParameter(reflectedParameterDescriptor.ParameterInfo, false);
 
 				if (doc != null)
 				{
@@ -69,7 +70,7 @@ namespace Swagger.Net
 
 			if (!reflected.MethodInfo.DeclaringType.Equals(typeof(SwaggerController)))
 			{
-				return DocsService.GetXmlFromMember(reflected.MethodInfo);
+				return DocsService.GetXmlFromMember(reflected.MethodInfo, false);
 			}
 
 			return result;
@@ -106,10 +107,10 @@ namespace Swagger.Net
 			return result;
 		}
 
-		public virtual IList<ResourceApiOperationParameterErrorResponse> GetErrorResponses(HttpActionDescriptor actionDescriptor)
+        public virtual IList<ResourceApiOperationParameterErrorResponse> GetErrorResponses(ApiDescription apiDescription)
 		{
 			var result = new List<ResourceApiOperationParameterErrorResponse>();
-			var memberNode = GetMemberNode(actionDescriptor);
+            var memberNode = GetMemberNode(apiDescription.ActionDescriptor);
 		
 			if (memberNode != null)
 			{
@@ -126,7 +127,19 @@ namespace Swagger.Net
 						errorResponse.Reason = n.GetAttribute("reason", "");
 					}
 
-					result.Add(errorResponse);
+
+                    XPathNavigator attNavigator = n.Clone();
+                    attNavigator.MoveToFirstAttribute();
+
+                    while (attNavigator.MoveToNextAttribute())
+                    {
+                        errorResponse.ExtraAttributes.Add(attNavigator.Name, attNavigator.Value);
+                    }
+
+                    if (ResourcesConfiguration.IsErrorMessageMapped(apiDescription, errorResponse))
+                    {
+                        result.Add(errorResponse);
+                    }
 				}
 			}
 

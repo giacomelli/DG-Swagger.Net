@@ -29,9 +29,10 @@ namespace Swagger.Net.WebApi.Controllers
         }
 
         /// <summary>
-        /// Create a new Tag
+        /// Create a new Tag.
         /// </summary>
-        /// <param name="value"></param>
+        /// <exception code="400" message="Value should be greater than zero." Test1="yes" Test2="something"/>				
+        /// <param name="value">The value.</param>
         public void Post([FromBody]string value)
         {
         }

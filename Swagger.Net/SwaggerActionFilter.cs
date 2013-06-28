@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System;
 using System.Threading.Tasks;
 using Swagger.Net.Helpers;
+using Swagger.Net.ResourceModels.Configuration;
 
 namespace Swagger.Net
 {
@@ -61,6 +62,7 @@ namespace Swagger.Net
 		/// Executes each request to give either a JSON Swagger spec doc or passes through the request
 		/// </summary>
 		/// <param name="actionContext">Context of the action</param>
+        
 		public override void OnActionExecuting(HttpActionContext actionContext)
 		{
 			var docRequest = actionContext.ControllerContext.RouteData.Values.ContainsKey(SwaggerGen.SWAGGER);
@@ -84,42 +86,67 @@ namespace Swagger.Net
 
 			actionContext.Response = response;
 		}
+        
+        /*
+        public override void OnActionExecuted(HttpActionExecutedContext actionExecutedContext)
+        {
+            var actionContext = actionExecutedContext.ActionContext;
+            var docRequest = actionContext.ControllerContext.RouteData.Values.ContainsKey(SwaggerGen.SWAGGER);
 
+            if (!docRequest)
+            {
+                base.OnActionExecuted(actionExecutedContext);
+                return;
+            }
+
+            var response = new HttpResponseMessage();
+
+            var formatter = actionContext.ControllerContext.Configuration.Formatters.JsonFormatter;
+            var resourceListing = GetDocs(actionContext);
+
+            formatter.SerializerSettings.ContractResolver = new SwaggerContractResolver(resourceListing);
+
+            response.Content = new ObjectContent<ResourceListing>(
+                resourceListing,
+                formatter);
+
+            actionContext.Response = response;
+        }
+        */
 		private ResourceListing GetDocs(HttpActionContext actionContext)
 		{
 			CollectApiDescriptions();
 			var resourceListing = SwaggerGen.CreateResourceListing(actionContext);			
 			var apis = GetApiDescriptionsByController(actionContext.ControllerContext.ControllerDescriptor.ControllerName);
 
-			foreach(var api in apis)
-			{
-				var resourceApi = SwaggerGen.CreateResourceApi(api);
-				resourceListing.AddApi(resourceApi);
-				ResourceApiOperation resourceApiOperation = null;
+            foreach (var api in apis)
+            {
+                if (ResourcesConfiguration.IsOperationMapped(api))
+                {
+                    var resourceApi = SwaggerGen.CreateResourceApi(api);
+                    resourceListing.AddApi(resourceApi);
 
-				Parallel.Invoke(
-				() =>
-				{
-					if (!CustomAttributeHelper.HasIgnoreAttribute(api.ActionDescriptor))
-					{
-						resourceApiOperation = SwaggerGen.CreateResourceApiOperation(api, DocProvider);
-						resourceApi.operations.Add(resourceApiOperation);
-					}
-				},
-				() =>
-				{
-					var reflectedActionDescriptor = api.ActionDescriptor as ReflectedHttpActionDescriptor;
-					resourceListing.Models.Add(SwaggerGen.CreateResourceModel(reflectedActionDescriptor.MethodInfo.ReturnType));
-				});
+                
+                    ResourceApiOperation resourceApiOperation = null;
+                
+                    if (!CustomAttributeHelper.HasIgnoreAttribute(api.ActionDescriptor))
+                    {
+                        resourceApiOperation = SwaggerGen.CreateResourceApiOperation(api, DocProvider);
+                        resourceApi.operations.Add(resourceApiOperation);
+                    }
+                  
+                    var reflectedActionDescriptor = api.ActionDescriptor as ReflectedHttpActionDescriptor;
+                    resourceListing.Models.Add(SwaggerGen.CreateResourceModel(reflectedActionDescriptor.MethodInfo.ReturnType));
+                  
 
-
-				foreach (var param in api.ParameterDescriptions)
-				{					
-					ResourceApiOperationParameter parameter = SwaggerGen.CreateResourceApiOperationParameter(api, param, DocProvider);
-					resourceApiOperation.parameters.Add(parameter);
-					resourceListing.Models.Add(SwaggerGen.CreateResourceModel(param, DocProvider));
-				}
-			}
+                    foreach (var param in api.ParameterDescriptions)
+                    {
+                        ResourceApiOperationParameter parameter = SwaggerGen.CreateResourceApiOperationParameter(api, param, DocProvider);
+                        resourceApiOperation.parameters.Add(parameter);
+                        resourceListing.Models.Add(SwaggerGen.CreateResourceModel(param, DocProvider));
+                    }
+                }
+            }
 
 			return resourceListing;
 		}

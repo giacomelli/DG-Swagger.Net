@@ -15,7 +15,7 @@ namespace Swagger.Net.ResourceModels
 
 		#region Constructors
 		/// <summary>
-		/// Initializes a new <see cref="ResourceModelNodeCollectionBase"/> class instance.
+		/// Initializes a new instance of the <see cref="Swagger.Net.ResourceModels.ResourceModelNodeCollectionBase{TResourceModel}"/> class.
 		/// </summary>
 		protected ResourceModelNodeCollectionBase()
 		{

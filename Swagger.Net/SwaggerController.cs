@@ -3,6 +3,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Web.Http;
 using Swagger.Net.Helpers;
+using Swagger.Net.ResourceModels.Configuration;
 
 namespace Swagger.Net
 {
@@ -26,7 +27,8 @@ namespace Swagger.Net
 
 			foreach (var api in GlobalConfiguration.Configuration.Services.GetApiExplorer().ApiDescriptions)
 			{
-				if (!CustomAttributeHelper.HasIgnoreAttribute(api.ActionDescriptor.ControllerDescriptor))
+				if (!CustomAttributeHelper.HasIgnoreAttribute(api.ActionDescriptor.ControllerDescriptor)
+				    &&	ResourcesConfiguration.IsResourceMapped(api.ActionDescriptor.ControllerDescriptor))
 				{
 					string controllerName = api.ActionDescriptor.ControllerDescriptor.ControllerName;
 					if (uniqueControllers.Contains(controllerName) ||

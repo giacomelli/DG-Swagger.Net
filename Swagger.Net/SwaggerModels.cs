@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using Swagger.Net.ResourceModels;
 using Swagger.Net.Helpers;
 using System.Configuration;
+using System.Diagnostics;
 
 namespace Swagger.Net
 {
@@ -193,7 +194,7 @@ namespace Swagger.Net
 				summary = api.Documentation,
 				notes = docProvider.GetNotes(api.ActionDescriptor),
 				parameters = new List<ResourceApiOperationParameter>(),
-				errorResponses = docProvider.GetErrorResponses(api.ActionDescriptor)
+				errorResponses = docProvider.GetErrorResponses(api)
 			};
 
 			return rApiOperation;
@@ -271,10 +272,21 @@ namespace Swagger.Net
 	/// </example>
 	/// </remarks>
 	/// </summary>
-	public class ResourceApiOperationParameterErrorResponse
-	{
-		#region Properties
-		/// <summary>
+    [DebuggerDisplay("{Code}: {Reason} ({ExtraAttributes.Count})")]
+    public class ResourceApiOperationParameterErrorResponse
+    {
+        #region Constructors
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ResourceApiOperationParameterErrorResponse"/> class.
+        /// </summary>
+        public ResourceApiOperationParameterErrorResponse()
+        {
+            ExtraAttributes = new Dictionary<string, string>();
+        }
+        #endregion
+
+        #region Properties
+        /// <summary>
 		/// Gets or sets the HTTP Status code.
 		/// </summary>
 		public string Code { get; set; }
@@ -283,6 +295,12 @@ namespace Swagger.Net
 		/// Gets os sets the message reason.
 		/// </summary>
 		public string Reason { get; set; }
+
+        /// <summary>
+        /// Gets the extra attributes.
+        /// </summary>
+        [JsonIgnore]
+        public IDictionary<string, string> ExtraAttributes { get; private set; }
 		#endregion
 	}
 }

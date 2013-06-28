@@ -21,7 +21,12 @@ namespace Swagger.Net.WebApi.Controllers
             return "value";
         }
 
-        // POST api/blogposts
+
+        /// <summary>
+        /// Posts the specified value.
+        /// </summary>
+        /// <param name="value">The value.</param>
+        /// <exception code="400" message="Value should be greater than zero." Test1="keep-alive" Test2="something" Test3="v2"/>				
         public void Post([FromBody]string value)
         {
         }

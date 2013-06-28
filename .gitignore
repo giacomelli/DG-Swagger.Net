@@ -28,3 +28,4 @@ _ReSharper*/
 packages/
 !nuget.exe
 Swagger.Net.userprefs
+Swagger.Net.UnitTests/test-results/
