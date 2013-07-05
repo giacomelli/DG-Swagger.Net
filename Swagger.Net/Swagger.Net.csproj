@@ -72,6 +72,8 @@
     <Compile Include="Helpers\CustomAttributeHelper.cs" />
     <Compile Include="ResourceListing.cs" />
     <Compile Include="ResourceModels\Configuration\ConfigurationProvider.cs" />
+    <Compile Include="ResourceModels\Configuration\Operands\AuthenticatedOperand.cs" />
+    <Compile Include="ResourceModels\Configuration\Operands\FuncOperand.cs" />
     <Compile Include="ResourceModels\Configuration\Operators\ContainsOperator.cs" />
     <Compile Include="ResourceModels\Configuration\Operands\ErrorResponseAttributeOperand.cs" />
     <Compile Include="ResourceModels\Configuration\Operands\FixedValueOperand.cs" />

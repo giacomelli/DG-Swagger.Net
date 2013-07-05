@@ -10,6 +10,7 @@ using System.Web.Http.Description;
 using System.Net.Http;
 using System.Diagnostics;
 using Swagger.Net.ResourceModels.Configuration.Operands;
+using Swagger.Net.ResourceModels.Configuration.Operators;
 
 namespace Swagger.Net.ResourceModels.Configuration
 {
@@ -44,6 +45,17 @@ namespace Swagger.Net.ResourceModels.Configuration
                 return typeof(TController);
             }
         }
+
+        /// <summary>
+        /// Gets the name.
+        /// </summary>
+        public string Name { 
+            get 
+            {
+                return typeof(TController).Name.Replace("Controller", "");
+            } 
+        }
+
 
         /// <summary>
         /// A configuration for all operations on current resource that do not have a specific configuration..
@@ -88,6 +100,18 @@ namespace Swagger.Net.ResourceModels.Configuration
             return operand;
         }
 
+        public void IsTrue(Func<object, bool> func)
+        {
+            var operand = new FuncOperand((o) =>
+            {
+                return func(o);
+            });
+
+            operand.Operator = new EqualsOperator(operand, new FixedValueOperand(true));
+
+            LeftOperands.Add(operand);
+        }
+
         /// <summary>
         /// Gets if the targer of configuration can be shown.
         /// </summary>
@@ -95,7 +119,7 @@ namespace Swagger.Net.ResourceModels.Configuration
 		{
             get
             {
-                return base.IsMapped(null);
+                return base.IsMapped(this);
             }
 		}
 
@@ -111,7 +135,7 @@ namespace Swagger.Net.ResourceModels.Configuration
 
             if (operation != null)
             {
-               return operation.IsMapped(null);
+                return operation.IsMapped(new OperationConfiguration(httpMethod, path));
             }
 
             return true;  

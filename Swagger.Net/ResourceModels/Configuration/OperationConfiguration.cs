@@ -3,6 +3,8 @@ using System.Diagnostics;
 using System.Net.Http;
 using System.Linq;
 using Swagger.Net.ResourceModels.Configuration.Operands;
+using System;
+using Swagger.Net.ResourceModels.Configuration.Operators;
 
 namespace Swagger.Net.ResourceModels.Configuration
 {
@@ -37,7 +39,7 @@ namespace Swagger.Net.ResourceModels.Configuration
         /// <value>
         /// The HTTP method.
         /// </value>
-        internal HttpMethod HttpMethod { get; private set; }
+        public HttpMethod HttpMethod { get; private set; }
 
         /// <summary>
         /// Gets the path.
@@ -45,7 +47,7 @@ namespace Swagger.Net.ResourceModels.Configuration
         /// <value>
         /// The path.
         /// </value>
-        internal string Path { get; private set; }
+        public string Path { get; private set; }
 
         internal bool HasErrorResponses
         {
@@ -76,6 +78,34 @@ namespace Swagger.Net.ResourceModels.Configuration
             LeftOperands.Add(operand);
 
             return operand;
+        }
+
+        public OperandBase Authenticated()
+        {
+            var operand = new AuthenticatedOperand();
+            LeftOperands.Add(operand);
+
+            return operand;
+        }
+
+        public OperandBase Func(Func<object, object> func)
+        {
+            var operand = new FuncOperand(func);
+            LeftOperands.Add(operand);
+
+            return operand;
+        }
+
+        public void IsTrue(Func<object, bool> func)
+        {
+            var operand = new FuncOperand((o) =>
+            {
+                return func(o);
+            });
+
+            operand.Operator = new EqualsOperator(operand, new FixedValueOperand(true));
+
+            LeftOperands.Add(operand);
         }
      
         internal bool CanShowErrorResponse(ResourceApiOperationParameterErrorResponse errorResponse)

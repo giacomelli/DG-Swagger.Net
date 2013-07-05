@@ -15,6 +15,12 @@ namespace Swagger.Net.ResourceModels.Configuration
         /// </summary>
 		Type ControllerType { get; }
 
+
+        /// <summary>
+        /// Gets the name.
+        /// </summary>
+        string Name { get; }
+
         /// <summary>
         /// Gets if the targer of configuration can be shown.
         /// </summary>
