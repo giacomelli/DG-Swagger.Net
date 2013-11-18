@@ -69,7 +69,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DefaultDocumentationResolver.cs" />
+    <Compile Include="FuncDocumentationResolver.cs" />
     <Compile Include="Helpers\CustomAttributeHelper.cs" />
+    <Compile Include="IDocResolver.cs" />
     <Compile Include="ResourceListing.cs" />
     <Compile Include="ResourceModels\Configuration\ConfigurationProvider.cs" />
     <Compile Include="ResourceModels\Configuration\Operands\AuthenticatedOperand.cs" />
@@ -98,6 +101,7 @@
     <Compile Include="ResourceModels\ResourceModelPropertyNodeCollection.cs" />
     <Compile Include="ResourceModels\ResourceModelPropertyNode.cs" />
     <Compile Include="ResourceModels\ResourceModelNodeCollection.cs" />
+    <Compile Include="SwaggerConfig.cs" />
     <Compile Include="SwaggerIgnoreAttribute.cs" />
     <Compile Include="SwaggerModels.cs" />
     <Compile Include="SwaggerActionFilter.cs" />

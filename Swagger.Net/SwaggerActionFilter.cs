@@ -86,33 +86,7 @@ namespace Swagger.Net
 
 			actionContext.Response = response;
 		}
-        
-        /*
-        public override void OnActionExecuted(HttpActionExecutedContext actionExecutedContext)
-        {
-            var actionContext = actionExecutedContext.ActionContext;
-            var docRequest = actionContext.ControllerContext.RouteData.Values.ContainsKey(SwaggerGen.SWAGGER);
-
-            if (!docRequest)
-            {
-                base.OnActionExecuted(actionExecutedContext);
-                return;
-            }
-
-            var response = new HttpResponseMessage();
-
-            var formatter = actionContext.ControllerContext.Configuration.Formatters.JsonFormatter;
-            var resourceListing = GetDocs(actionContext);
-
-            formatter.SerializerSettings.ContractResolver = new SwaggerContractResolver(resourceListing);
-
-            response.Content = new ObjectContent<ResourceListing>(
-                resourceListing,
-                formatter);
-
-            actionContext.Response = response;
-        }
-        */
+               
 		private ResourceListing GetDocs(HttpActionContext actionContext)
 		{
 			CollectApiDescriptions();
@@ -136,14 +110,14 @@ namespace Swagger.Net
                     }
                   
                     var reflectedActionDescriptor = api.ActionDescriptor as ReflectedHttpActionDescriptor;
-                    resourceListing.Models.Add(SwaggerGen.CreateResourceModel(reflectedActionDescriptor.MethodInfo.ReturnType));
+                    resourceListing.Models.AddRange(SwaggerGen.CreateResourceModel(reflectedActionDescriptor.MethodInfo.ReturnType, DocProvider));
                   
 
                     foreach (var param in api.ParameterDescriptions)
                     {
                         ResourceApiOperationParameter parameter = SwaggerGen.CreateResourceApiOperationParameter(api, param, DocProvider);
                         resourceApiOperation.parameters.Add(parameter);
-                        resourceListing.Models.Add(SwaggerGen.CreateResourceModel(param, DocProvider));
+                        resourceListing.Models.AddRange(SwaggerGen.CreateResourceModel(param, DocProvider));
                     }
                 }
             }

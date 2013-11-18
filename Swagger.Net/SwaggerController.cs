@@ -42,11 +42,11 @@ namespace Swagger.Net
 					// Model
 					foreach (var param in api.ParameterDescriptions)
 					{
-						r.Models.Add(SwaggerGen.CreateResourceModel(param, docProvider));
+						r.Models.AddRange(SwaggerGen.CreateResourceModel(param, docProvider));
 					}
 				}
 			}
-
+            
 			HttpResponseMessage resp = new HttpResponseMessage();
 
 			resp.Content = new ObjectContent<ResourceListing>(r, ControllerContext.Configuration.Formatters.JsonFormatter);            

@@ -36,6 +36,17 @@ namespace Swagger.Net.ResourceModels
 			}
 		}
 
+        public void AddRange(IEnumerable<TResourceModel> models)
+        {
+            foreach (var m in models)
+            {
+                if (!m_models.Any(a => a.Id.Equals(m.Id, System.StringComparison.Ordinal)))
+                {
+                    m_models.Add(m);
+                }
+            }
+        }
+
 		/// <summary>
 		/// Returns the enumeration of all dynamic member names.
 		/// </summary>

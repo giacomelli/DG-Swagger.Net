@@ -11,6 +11,7 @@ using Swagger.Net.ResourceModels;
 using Swagger.Net.Helpers;
 using System.Configuration;
 using System.Diagnostics;
+using DocsByReflection;
 
 namespace Swagger.Net
 {
@@ -91,7 +92,7 @@ namespace Swagger.Net
 			ResourceApi rApi = new ResourceApi()
 			{
 				path = "/" + api.RelativePath,
-				description = api.Documentation,
+                description = DocsService.GetXmlFromType(api.ActionDescriptor.ControllerDescriptor.ControllerType, false).InnerText,
 				operations = new List<ResourceApiOperation>()
 			};
 
@@ -100,24 +101,25 @@ namespace Swagger.Net
 			return rApi;
 		}
 
-		private static Dictionary<Type, ResourceModelNode> s_cache = new Dictionary<Type, ResourceModelNode>();
+        private static Dictionary<Type, IList<ResourceModelNode>> s_cache = new Dictionary<Type, IList<ResourceModelNode>>();
 
 		private static object s_lock = new object();
 
-		public static ResourceModelNode CreateResourceModel(ApiParameterDescription param, XmlCommentDocumentationProvider docProvider)
+		public static IList<ResourceModelNode> CreateResourceModel(ApiParameterDescription param, XmlCommentDocumentationProvider docProvider)
 		{
 			return CreateResourceModel(param, param.ParameterDescriptor.ParameterType, docProvider);
 		}
 
-		public static ResourceModelNode CreateResourceModel(Type modelType)
+        public static IList<ResourceModelNode> CreateResourceModel(Type modelType, XmlCommentDocumentationProvider docProvider)
 		{
-			return CreateResourceModel(null, modelType, null);
+            return CreateResourceModel(null, modelType, docProvider);
 		}
 
-		private static ResourceModelNode CreateResourceModel(ApiParameterDescription param, Type modelType, XmlCommentDocumentationProvider docProvider)
+        private static IList<ResourceModelNode> CreateResourceModel(ApiParameterDescription param, Type modelType, XmlCommentDocumentationProvider docProvider)
 		{
 			lock (s_lock)
 			{				
+                var result = new List<ResourceModelNode>();
 				ResourceModelNode rModel = null;
 			
 				if ((!modelType.IsValueType && !modelType.Equals(typeof(string))))
@@ -127,10 +129,11 @@ namespace Swagger.Net
 						modelType = modelType.GetGenericArguments().First();
 						return CreateResourceModel(param, modelType, docProvider);
 					}
-
+                    
 					if (s_cache.ContainsKey(modelType))
 					{
-						return s_cache[modelType];
+                        result.AddRange(s_cache[modelType]);
+                        return result;
 					}
 
 
@@ -145,18 +148,30 @@ namespace Swagger.Net
 						property.Id = typeProperty.Name;
 						property.Type = TypeParser.Parse(typeProperty.PropertyType);
 
-						if (docProvider != null && param != null)
+						if (docProvider != null)
 						{
-							property.Description = docProvider.GetDocumentation(param.ParameterDescriptor);
+                            property.Description = docProvider.GetDocumentation(typeProperty);
+
+                            if (typeProperty.PropertyType.IsEnum)
+                            {
+                                property.AllowableValues = CreateAllowableValues(typeProperty.PropertyType);
+                               
+                            }
+                            else if((typeProperty.PropertyType.IsClass || typeProperty.PropertyType.IsValueType) && typeof(string) != typeProperty.PropertyType)
+                            {
+                                result.AddRange(CreateResourceModel(typeProperty.PropertyType, docProvider));
+
+                            }
 						}
 
 						rModel.Properties.Add(property);
 					}
-
-					s_cache.Add(modelType, rModel);
+					
+                    result.Add(rModel);
+                    s_cache.Add(modelType, result);
 				}
 
-				return rModel;
+				return result;
 			}
 		}
 

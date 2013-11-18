@@ -51,6 +51,19 @@ namespace Swagger.Net
 			return result;
 		}
 
+        public virtual string GetDocumentation(MemberInfo member)
+        {
+            var doc = DocsService.GetXmlFromMember(member, false);
+            string result = "";
+
+            if (doc != null)
+            {
+                result = doc.InnerText;
+            }
+
+            return SwaggerConfig.DocumentationResolver.GetDocumentation(result, member);
+        }
+
 		public virtual bool GetRequired(HttpParameterDescriptor parameterDescriptor)
 		{
 			ReflectedHttpParameterDescriptor reflectedParameterDescriptor = parameterDescriptor as ReflectedHttpParameterDescriptor;
