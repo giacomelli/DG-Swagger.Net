@@ -10,6 +10,7 @@ using System.Xml.XPath;
 using DocsByReflection;
 using System.Xml;
 using Swagger.Net.ResourceModels.Configuration;
+using Swagger.Net.Serialization;
 
 namespace Swagger.Net
 {
@@ -172,14 +173,14 @@ namespace Swagger.Net
 					Type[] types = reflectedActionDescriptor.MethodInfo.ReturnParameter.ParameterType.GetGenericArguments();
 					for(int i = 0; i < types.Length; i++)
 					{
-						sb.Append(types[i].Name);
+						sb.Append(SwaggerContractResolver.ToCamelCase(types[i].Name));
 						if(i != (types.Length - 1)) sb.Append(", ");
 					}
 					sb.Append(">");
 					return sb.Replace("`1","").ToString();
 				}
 				else
-					return reflectedActionDescriptor.MethodInfo.ReturnType.Name;
+					return SwaggerContractResolver.ToCamelCase(reflectedActionDescriptor.MethodInfo.ReturnType.Name);
 			}
 
 			return "void";

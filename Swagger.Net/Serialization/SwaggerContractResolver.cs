@@ -8,7 +8,7 @@ namespace Swagger.Net.Serialization
 	/// <summary>
 	/// A contract resolver to deal with Swagger spec.
 	/// </summary>
-	public class SwaggerContractResolver : DefaultContractResolver
+	public class SwaggerContractResolver : CamelCasePropertyNamesContractResolver
 	{
 		#region Fields
 		private ResourceListing m_resourceListing;
@@ -46,7 +46,7 @@ namespace Swagger.Net.Serialization
 		/// </summary>
 		/// <param name="source">The source.</param>
 		/// <returns>The source string in camel case.</returns>
-		private static string ToCamelCase(string source)
+		public static string ToCamelCase(string source)
 		{
 			var parts = source.Split(' ');
 			var newString = new StringBuilder();

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections;
 using System.Globalization;
 using System.Linq;
+using Swagger.Net.Serialization;
 
 namespace Swagger.Net.Helpers
 {
@@ -29,7 +30,7 @@ namespace Swagger.Net.Helpers
 			s_typesMapping.Add(typeof(float), "float");
 			s_typesMapping.Add(typeof(double), "double");
 			s_typesMapping.Add(typeof(string), "string");
-			s_typesMapping.Add(typeof(DateTime), "Date");
+			s_typesMapping.Add(typeof(DateTime), "date");
 			s_typesMapping.Add(typeof(char), "string");
 			s_typesMapping.Add(typeof(short), "int");
 		}
@@ -51,12 +52,16 @@ namespace Swagger.Net.Helpers
 			}
 			else if (type.IsGenericType && type.GetInterface("IEnumerable") != null)
 			{
-				result = String.Format(CultureInfo.InvariantCulture, "List[{0}]", type.GetGenericArguments().First().Name);
+				result = String.Format(CultureInfo.InvariantCulture, "List[{0}]",  SwaggerContractResolver.ToCamelCase(type.GetGenericArguments().First().Name));
 			}
 			else if (result.EndsWith("[]", StringComparison.OrdinalIgnoreCase))
 			{
-				result = String.Format(CultureInfo.InvariantCulture, "List[{0}]", result.Replace("[]", ""));
+				result = String.Format(CultureInfo.InvariantCulture, "List[{0}]", SwaggerContractResolver.ToCamelCase(result.Replace("[]", "")));
 			}
+            else
+            {
+                result = SwaggerContractResolver.ToCamelCase(result);
+            }
 
 			return result;
 		}
@@ -78,10 +83,18 @@ namespace Swagger.Net.Helpers
 			{
 				result = type.Replace("IEnumerable<", "List[").Replace(">", "]");
 			}
-			else if (type.StartsWith("List<"))
-			{
-				result = type.Replace("List<", "List[").Replace(">", "]");
-			}
+            else if (type.StartsWith("List<"))
+            {
+                result = type.Replace("List<", "List[").Replace(">", "]");
+            }
+            else if (type.StartsWith("IList<"))
+            {
+                result = type.Replace("IList<", "List[").Replace(">", "]");
+            }
+            else
+            {
+                result = SwaggerContractResolver.ToCamelCase(type);
+            }
 
 			return result;
 		}

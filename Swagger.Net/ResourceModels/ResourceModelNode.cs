@@ -14,6 +14,7 @@ namespace Swagger.Net.ResourceModels
 		public ResourceModelNode()
 		{
 			Properties = new ResourceModelPropertyNodeCollection();
+            Required = new List<string>();
 		}
 		#endregion
 
@@ -22,6 +23,7 @@ namespace Swagger.Net.ResourceModels
 		/// Gets or sets the properties.
 		/// </summary>
 		public ResourceModelPropertyNodeCollection Properties { get; private set;}
+        public IList<string> Required { get; private set; }
 		#endregion
 	}
 }

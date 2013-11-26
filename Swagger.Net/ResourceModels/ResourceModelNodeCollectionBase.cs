@@ -23,8 +23,18 @@ namespace Swagger.Net.ResourceModels
 		}
 		#endregion
 
-		#region Methods
-		/// <summary>
+        #region Properties
+        public int Count
+        {
+            get
+            {
+                return m_models.Count;
+            }
+        }
+        #endregion
+
+        #region Methods
+        /// <summary>
 		/// Adds a model to the collection.
 		/// </summary>
 		/// <param name="model">The model.</param>

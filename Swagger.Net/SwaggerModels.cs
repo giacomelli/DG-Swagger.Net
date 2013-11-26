@@ -122,7 +122,7 @@ namespace Swagger.Net
                 var result = new List<ResourceModelNode>();
 				ResourceModelNode rModel = null;
 			
-				if ((!modelType.IsValueType && !modelType.Equals(typeof(string))))
+				if ((!modelType.IsEnum && !modelType.Equals(typeof(string))))
 				{
 					if (modelType.IsGenericType)
 					{
@@ -139,14 +139,29 @@ namespace Swagger.Net
 
 					rModel = new ResourceModelNode()
 					{
-						Id = modelType.Name
+                        Id = TypeParser.Parse(modelType.Name)
 					};
+
+                    s_cache.Add(modelType, result);
 
 					foreach (var typeProperty in modelType.GetProperties(BindingFlags.Public | BindingFlags.Instance))
 					{
 						var property = new ResourceModelPropertyNode();
-						property.Id = typeProperty.Name;
+						property.Id = TypeParser.Parse(typeProperty.Name);
 						property.Type = TypeParser.Parse(typeProperty.PropertyType);
+
+                        if (typeProperty.PropertyType.IsValueType || Nullable.GetUnderlyingType(typeProperty.PropertyType) == null)
+                        {
+                            rModel.Required.Add(property.Id);
+                        }
+
+                        if (property.Type.StartsWith("List["))
+                        {
+                            property.Type = "array";
+                            property.DefineContainerType(typeProperty.PropertyType.GetGenericArguments().First());
+                        }
+
+                        result.AddRange(CreateResourceModel(typeProperty.PropertyType, docProvider));                        
 
 						if (docProvider != null)
 						{
@@ -166,9 +181,11 @@ namespace Swagger.Net
 
 						rModel.Properties.Add(property);
 					}
-					
-                    result.Add(rModel);
-                    s_cache.Add(modelType, result);
+
+                    if (rModel.Properties.Count > 0)
+                    {
+                        result.Add(rModel);
+                    }
 				}
 
 				return result;

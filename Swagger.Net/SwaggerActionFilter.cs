@@ -76,6 +76,7 @@ namespace Swagger.Net
 			var response = new HttpResponseMessage();
 
 			var formatter = actionContext.ControllerContext.Configuration.Formatters.JsonFormatter;
+            
 			var resourceListing = GetDocs(actionContext);
 
 			formatter.SerializerSettings.ContractResolver = new SwaggerContractResolver(resourceListing);

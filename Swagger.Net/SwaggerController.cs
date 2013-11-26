@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Net.Http;
 using System.Web.Http;
+using Newtonsoft.Json.Serialization;
 using Swagger.Net.Helpers;
 using Swagger.Net.ResourceModels.Configuration;
 
@@ -20,6 +21,9 @@ namespace Swagger.Net
 		/// <returns>JSON document representing structure of API</returns>
 		public HttpResponseMessage Get()
 		{
+            var formatter = ControllerContext.Configuration.Formatters.JsonFormatter;
+            formatter.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+
 			var docProvider = (XmlCommentDocumentationProvider)GlobalConfiguration.Configuration.Services.GetDocumentationProvider();
 
 			ResourceListing r = SwaggerGen.CreateResourceListing(ControllerContext);

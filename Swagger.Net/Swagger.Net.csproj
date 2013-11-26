@@ -35,6 +35,10 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="DocsByReflection, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\DocsByReflection.1.0.7.2\lib\net40\DocsByReflection.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Configuration" />
@@ -64,9 +68,6 @@
     <Reference Include="HelperSharp">
       <HintPath>..\packages\HelperSharp.0.0.2.7\lib\net35\HelperSharp.dll</HintPath>
     </Reference>
-    <Reference Include="DocsByReflection">
-      <HintPath>..\packages\DocsByReflection.1.0.6\lib\net40\DocsByReflection.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DefaultDocumentationResolver.cs" />
@@ -94,6 +95,7 @@
     <Compile Include="ResourceModels\ResourceModelNodeCollectionBase.cs" />
     <Compile Include="ResourceModels\ResourceModelNodeBase.cs" />
     <Compile Include="ResourceModels\ResourceModelPropertyAllowableValuesNode.cs" />
+    <Compile Include="ResourceModels\ResourceModelPropertyItemsNode.cs" />
     <Compile Include="Serialization\SwaggerContractResolver.cs" />
     <Compile Include="Helpers\TypeParser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
