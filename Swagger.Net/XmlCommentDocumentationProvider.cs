@@ -14,43 +14,53 @@ using Swagger.Net.Serialization;
 
 namespace Swagger.Net
 {
-	/// <summary>
-	/// Accesses the XML doc blocks written in code to further document the API.
-	/// All credit goes to: <see cref="http://blogs.msdn.com/b/yaohuang1/archive/2012/05/21/asp-net-web-api-generating-a-web-api-help-page-using-apiexplorer.aspx"/>
-	/// </summary>
-	public class XmlCommentDocumentationProvider : IDocumentationProvider
-	{
-		#region Constants
-		private const string NoDocumentionFoundMark = "No Documentation Found.";
-		#endregion
+    /// <summary>
+    /// Accesses the XML doc blocks written in code to further document the API.
+    /// All credit goes to: <see cref="http://blogs.msdn.com/b/yaohuang1/archive/2012/05/21/asp-net-web-api-generating-a-web-api-help-page-using-apiexplorer.aspx"/>
+    /// </summary>
+    public class XmlCommentDocumentationProvider : IDocumentationProvider
+    {
+        #region Constants
+        private const string NoDocumentionFoundMark = "No Documentation Found.";
+        #endregion
 
-		XPathNavigator _documentNavigator;
-		private const string _methodExpression = "/doc/members/member[@name='M:{0}']";
-		private static Regex nullableTypeNameRegex = new Regex(@"(.*\.Nullable)" + Regex.Escape("`1[[") + "([^,]*),.*");
+        XPathNavigator _documentNavigator;
+        private const string _methodExpression = "/doc/members/member[@name='M:{0}']";
+        private static Regex nullableTypeNameRegex = new Regex(@"(.*\.Nullable)" + Regex.Escape("`1[[") + "([^,]*),.*");
 
-		public XmlCommentDocumentationProvider(string documentPath)
-		{
-			XPathDocument xpath = new XPathDocument(documentPath);
-			_documentNavigator = xpath.CreateNavigator();
-		}
+        public XmlCommentDocumentationProvider(string documentPath)
+        {
+            XPathDocument xpath = new XPathDocument(documentPath);
+            _documentNavigator = xpath.CreateNavigator();
+        }
 
-		public virtual string GetDocumentation(HttpParameterDescriptor parameterDescriptor)
-		{
-			var result = NoDocumentionFoundMark;
-			var reflectedParameterDescriptor = parameterDescriptor as ReflectedHttpParameterDescriptor;
+        public virtual string GetDocumentation(HttpParameterDescriptor parameterDescriptor)
+        {
+            var result = NoDocumentionFoundMark;
+            var reflectedParameterDescriptor = parameterDescriptor as ReflectedHttpParameterDescriptor;
 
-			if (reflectedParameterDescriptor != null)
-			{
-				var doc =  DocsService.GetXmlFromParameter(reflectedParameterDescriptor.ParameterInfo, false);
+            if (reflectedParameterDescriptor != null)
+            {
+                var doc = DocsService.GetXmlFromParameter(reflectedParameterDescriptor.ParameterInfo, false);
 
-				if (doc != null)
-				{
-					result = doc.InnerText;
-				}
-			}
+                if (doc != null)
+                {
+                    result = doc.InnerText;
+                }
+            }
 
-			return result;
-		}
+            return result;
+        }
+
+        public string GetDocumentation(HttpControllerDescriptor controllerDescriptor)
+        {
+            return "";
+        }
+
+        public string GetResponseDocumentation(HttpActionDescriptor actionDescriptor)
+        {
+            return "";
+        }
 
         public virtual string GetDocumentation(MemberInfo member)
         {
@@ -65,81 +75,81 @@ namespace Swagger.Net
             return SwaggerConfig.DocumentationResolver.GetDocumentation(result, member);
         }
 
-		public virtual bool GetRequired(HttpParameterDescriptor parameterDescriptor)
-		{
-			ReflectedHttpParameterDescriptor reflectedParameterDescriptor = parameterDescriptor as ReflectedHttpParameterDescriptor;
-		
-			if (reflectedParameterDescriptor != null)
-			{
-				return !reflectedParameterDescriptor.ParameterInfo.IsOptional;
-			}
+        public virtual bool GetRequired(HttpParameterDescriptor parameterDescriptor)
+        {
+            ReflectedHttpParameterDescriptor reflectedParameterDescriptor = parameterDescriptor as ReflectedHttpParameterDescriptor;
 
-			return true;
-		}
+            if (reflectedParameterDescriptor != null)
+            {
+                return !reflectedParameterDescriptor.ParameterInfo.IsOptional;
+            }
 
-		private XmlElement GetDocElement(HttpActionDescriptor actionDescriptor)
-		{
-			XmlElement result = null;
-			var reflected = actionDescriptor as ReflectedHttpActionDescriptor;
+            return true;
+        }
 
-			if (!reflected.MethodInfo.DeclaringType.Equals(typeof(SwaggerController)))
-			{
-				return DocsService.GetXmlFromMember(reflected.MethodInfo, false);
-			}
+        private XmlElement GetDocElement(HttpActionDescriptor actionDescriptor)
+        {
+            XmlElement result = null;
+            var reflected = actionDescriptor as ReflectedHttpActionDescriptor;
 
-			return result;
-		}
+            if (!reflected.MethodInfo.DeclaringType.Equals(typeof(SwaggerController)))
+            {
+                return DocsService.GetXmlFromMember(reflected.MethodInfo, false);
+            }
 
-		public virtual string GetDocumentation(HttpActionDescriptor actionDescriptor)
-		{
-			var result = NoDocumentionFoundMark;
-			var doc = GetDocElement(actionDescriptor);
+            return result;
+        }
 
-			if (doc != null)
-			{
-				result = doc.SelectSingleNode("summary").InnerText;
-			}
+        public virtual string GetDocumentation(HttpActionDescriptor actionDescriptor)
+        {
+            var result = NoDocumentionFoundMark;
+            var doc = GetDocElement(actionDescriptor);
 
-			return result;
-		}
+            if (doc != null)
+            {
+                result = doc.SelectSingleNode("summary").InnerText;
+            }
 
-		public virtual string GetNotes(HttpActionDescriptor actionDescriptor)
-		{
-			var result = NoDocumentionFoundMark;
-			var doc = GetDocElement(actionDescriptor);
+            return result;
+        }
 
-			if (doc != null)
-			{
-				var remarksNode = doc.SelectSingleNode("remarks");
+        public virtual string GetNotes(HttpActionDescriptor actionDescriptor)
+        {
+            var result = NoDocumentionFoundMark;
+            var doc = GetDocElement(actionDescriptor);
 
-				if (remarksNode != null)
-				{
-					result = remarksNode.InnerText;
-				}
-			}
+            if (doc != null)
+            {
+                var remarksNode = doc.SelectSingleNode("remarks");
 
-			return result;
-		}
+                if (remarksNode != null)
+                {
+                    result = remarksNode.InnerText;
+                }
+            }
+
+            return result;
+        }
 
         public virtual IList<ResourceApiOperationParameterErrorResponse> GetErrorResponses(ApiDescription apiDescription)
-		{
-			var result = new List<ResourceApiOperationParameterErrorResponse>();
+        {
+            var result = new List<ResourceApiOperationParameterErrorResponse>();
             var memberNode = GetMemberNode(apiDescription.ActionDescriptor);
-		
-			if (memberNode != null)
-			{
-				var navigator = memberNode.Select("exception");
 
-				foreach (XPathNavigator n in navigator)
-				{
-					var errorResponse = new ResourceApiOperationParameterErrorResponse();
-					errorResponse.Code = n.GetAttribute("code", "");
-					errorResponse.Reason = n.GetAttribute("message", "");
+            if (memberNode != null)
+            {
+                var navigator = memberNode.Select("exception");
 
-					if (String.IsNullOrEmpty(errorResponse.Reason))
-					{
-						errorResponse.Reason = n.GetAttribute("reason", "");
-					}
+                foreach (XPathNavigator n in navigator)
+                {
+                    var errorResponse = new ResourceApiOperationParameterErrorResponse();
+                    errorResponse.Code = n.GetAttribute("code", "");
+                    errorResponse.Reason = n.GetAttribute("message", "");
+
+                    if (String.IsNullOrEmpty(errorResponse.Reason))
+                    {
+                        errorResponse.Reason = n.GetAttribute("reason", "");
+                    }
 
 
                     XPathNavigator attNavigator = n.Clone();
@@ -154,95 +164,95 @@ namespace Swagger.Net
                     {
                         result.Add(errorResponse);
                     }
-				}
-			}
+                }
+            }
 
-			return result;
-		}
+            return result;
+        }
 
-		public virtual string GetResponseClass(HttpActionDescriptor actionDescriptor)
-		{
-			var reflectedActionDescriptor = actionDescriptor as ReflectedHttpActionDescriptor;
+        public virtual string GetResponseClass(HttpActionDescriptor actionDescriptor)
+        {
+            var reflectedActionDescriptor = actionDescriptor as ReflectedHttpActionDescriptor;
 
-			if (reflectedActionDescriptor != null)
-			{
-				if (reflectedActionDescriptor.MethodInfo.ReturnType.IsGenericType)
-				{
-					StringBuilder sb = new StringBuilder(reflectedActionDescriptor.MethodInfo.ReturnParameter.ParameterType.Name);
-					sb.Append("<");
-					Type[] types = reflectedActionDescriptor.MethodInfo.ReturnParameter.ParameterType.GetGenericArguments();
-					for(int i = 0; i < types.Length; i++)
-					{
-						sb.Append(SwaggerContractResolver.ToCamelCase(types[i].Name));
-						if(i != (types.Length - 1)) sb.Append(", ");
-					}
-					sb.Append(">");
-					return sb.Replace("`1","").ToString();
-				}
-				else
-					return SwaggerContractResolver.ToCamelCase(reflectedActionDescriptor.MethodInfo.ReturnType.Name);
-			}
+            if (reflectedActionDescriptor != null)
+            {
+                if (reflectedActionDescriptor.MethodInfo.ReturnType.IsGenericType)
+                {
+                    StringBuilder sb = new StringBuilder(reflectedActionDescriptor.MethodInfo.ReturnParameter.ParameterType.Name);
+                    sb.Append("<");
+                    Type[] types = reflectedActionDescriptor.MethodInfo.ReturnParameter.ParameterType.GetGenericArguments();
+                    for (int i = 0; i < types.Length; i++)
+                    {
+                        sb.Append(SwaggerContractResolver.ToCamelCase(types[i].Name));
+                        if (i != (types.Length - 1)) sb.Append(", ");
+                    }
+                    sb.Append(">");
+                    return sb.Replace("`1", "").ToString();
+                }
+                else
+                    return SwaggerContractResolver.ToCamelCase(reflectedActionDescriptor.MethodInfo.ReturnType.Name);
+            }
 
-			return "void";
-		}
+            return "void";
+        }
 
-		public virtual string GetNickname(HttpActionDescriptor actionDescriptor)
-		{
-			ReflectedHttpActionDescriptor reflectedActionDescriptor = actionDescriptor as ReflectedHttpActionDescriptor;
-			if (reflectedActionDescriptor != null)
-			{
-				return reflectedActionDescriptor.MethodInfo.Name;
-			}
+        public virtual string GetNickname(HttpActionDescriptor actionDescriptor)
+        {
+            ReflectedHttpActionDescriptor reflectedActionDescriptor = actionDescriptor as ReflectedHttpActionDescriptor;
+            if (reflectedActionDescriptor != null)
+            {
+                return reflectedActionDescriptor.MethodInfo.Name;
+            }
 
-			return "NicknameNotFound";
-		}
+            return "NicknameNotFound";
+        }
 
-		private XPathNavigator GetMemberNode(HttpActionDescriptor actionDescriptor)
-		{
-			ReflectedHttpActionDescriptor reflectedActionDescriptor = actionDescriptor as ReflectedHttpActionDescriptor;
-			if (reflectedActionDescriptor != null)
-			{
-				string selectExpression = string.Format(_methodExpression, GetMemberName(reflectedActionDescriptor.MethodInfo));
-				XPathNavigator node = _documentNavigator.SelectSingleNode(selectExpression);
-				if (node != null)
-				{
-					return node;
-				}
-			}
+        private XPathNavigator GetMemberNode(HttpActionDescriptor actionDescriptor)
+        {
+            ReflectedHttpActionDescriptor reflectedActionDescriptor = actionDescriptor as ReflectedHttpActionDescriptor;
+            if (reflectedActionDescriptor != null)
+            {
+                string selectExpression = string.Format(_methodExpression, GetMemberName(reflectedActionDescriptor.MethodInfo));
+                XPathNavigator node = _documentNavigator.SelectSingleNode(selectExpression);
+                if (node != null)
+                {
+                    return node;
+                }
+            }
 
-			return null;
-		}
+            return null;
+        }
 
-		private static string GetMemberName(MethodInfo method)
-		{
-			string name = string.Format("{0}.{1}", method.DeclaringType.FullName, method.Name);
-			var parameters = method.GetParameters();
-			if (parameters.Length != 0)
-			{
-				string[] parameterTypeNames = parameters.Select(param => ProcessTypeName(param.ParameterType.FullName)).ToArray();
-				name += string.Format("({0})", string.Join(",", parameterTypeNames));
-			}
+        private static string GetMemberName(MethodInfo method)
+        {
+            string name = string.Format("{0}.{1}", method.DeclaringType.FullName, method.Name);
+            var parameters = method.GetParameters();
+            if (parameters.Length != 0)
+            {
+                string[] parameterTypeNames = parameters.Select(param => ProcessTypeName(param.ParameterType.FullName)).ToArray();
+                name += string.Format("({0})", string.Join(",", parameterTypeNames));
+            }
 
-			return name;
-		}
+            return name;
+        }
 
-		public static string ProcessTypeName(string typeName)
-		{
-			//handle nullable
-			var result = nullableTypeNameRegex.Match(typeName);
-			if (result.Success)
-			{
-				return string.Format("{0}{{{1}}}", result.Groups[1].Value, result.Groups[2].Value);
-			}
+        public static string ProcessTypeName(string typeName)
+        {
+            //handle nullable
+            var result = nullableTypeNameRegex.Match(typeName);
+            if (result.Success)
+            {
+                return string.Format("{0}{{{1}}}", result.Groups[1].Value, result.Groups[2].Value);
+            }
 
-			result = Regex.Match(typeName, @"System\.Collections\.Generic\.List\`1\[\[([A-Z0-9_\.]+)", RegexOptions.IgnoreCase);
+            result = Regex.Match(typeName, @"System\.Collections\.Generic\.List\`1\[\[([A-Z0-9_\.]+)", RegexOptions.IgnoreCase);
 
-			if (result.Success)
-			{
-				return string.Format(@"System.Collections.Generic.List{{{0}}}", result.Groups[1].Value);
-			}
+            if (result.Success)
+            {
+                return string.Format(@"System.Collections.Generic.List{{{0}}}", result.Groups[1].Value);
+            }
 
-			return typeName;
-		}
-	}
+            return typeName;
+        }
+    }
 }

@@ -5,13 +5,15 @@ using System.Web.Http;
 using Newtonsoft.Json.Serialization;
 using Swagger.Net.Helpers;
 using Swagger.Net.ResourceModels.Configuration;
+using WebApiProxy;
 
 namespace Swagger.Net
 {
 	/// <summary>
 	/// Swagger controller.
 	/// </summary>
-	public class SwaggerController : ApiController
+	[ExcludeProxy]
+    public class SwaggerController : ApiController
 	{
 		/// <summary>
 		/// Get the resource description of the api for swagger documentation
@@ -41,6 +43,13 @@ namespace Swagger.Net
 					uniqueControllers.Add(controllerName);
 
 					ResourceApi rApi = SwaggerGen.CreateResourceApi(api);
+                    var queryIndex = rApi.path.IndexOf("?");
+
+                    if (queryIndex > -1)
+                    {
+                        rApi.path = rApi.path.Substring(0, queryIndex);
+                    }
+                    
 					r.AddApi(rApi);
 
 					// Model
