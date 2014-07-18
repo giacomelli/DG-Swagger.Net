@@ -151,6 +151,11 @@ namespace Swagger.Net
                         errorResponse.Reason = n.GetAttribute("reason", "");
                     }
 
+                    if (String.IsNullOrEmpty(errorResponse.Reason))
+                    {
+                        errorResponse.Reason = n.InnerXml;
+                    }
+
 
                     XPathNavigator attNavigator = n.Clone();
                     attNavigator.MoveToFirstAttribute();

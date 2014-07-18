@@ -37,13 +37,13 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DocsByReflection, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="DocsByReflection, Version=1.0.8.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\DocsByReflection.1.0.7.2\lib\net40\DocsByReflection.dll</HintPath>
+      <HintPath>..\packages\DocsByReflection.1.0.8.0\lib\net40\DocsByReflection.dll</HintPath>
     </Reference>
-    <Reference Include="HelperSharp, Version=1.0.5120.16113, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="HelperSharp, Version=1.0.5310.16532, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\HelperSharp.0.0.3.6\lib\net35\HelperSharp.dll</HintPath>
+      <HintPath>..\packages\HelperSharp.0.0.3.7\lib\net35\HelperSharp.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
