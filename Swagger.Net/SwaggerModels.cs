@@ -157,7 +157,15 @@ namespace Swagger.Net
                         if (property.Type.StartsWith("List["))
                         {
                             property.Type = "array";
-                            property.DefineContainerType(typeProperty.PropertyType.GetGenericArguments().First());
+
+                            var itemType = typeProperty.PropertyType.GetGenericArguments().FirstOrDefault();
+
+                            if (itemType == null)
+                            {
+                                itemType = typeProperty.PropertyType;
+                            }
+
+                            property.DefineContainerType(itemType);
                         }
 
                         result.AddRange(CreateResourceModel(typeProperty.PropertyType, docProvider));

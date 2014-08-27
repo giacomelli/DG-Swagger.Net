@@ -1,23 +1,22 @@
 using System;
 using System.Collections.Generic;
-using System.Web.Http;
 using System.Linq;
+using System.Reflection;
 using System.Web.Http.Controllers;
 using System.Web.Http.Description;
-using System.Reflection;
 
 namespace Swagger.Net.ResourceModels.Configuration
 {
     /// <summary>
     /// Resposinble to load and initialize all ResourceConfiguration.
     /// </summary>
-	public static class ResourcesConfiguration
-	{
-		#region Fields
-		private static List<IResourceConfiguration> s_configurations = new List<IResourceConfiguration>();
-		#endregion
+    public static class ResourcesConfiguration
+    {
+        #region Fields
+        private static List<IResourceConfiguration> s_configurations = new List<IResourceConfiguration>();
+        #endregion
 
-		#region Methods
+        #region Methods
         /// <summary>
         /// Initializes all ResourceConfiguration from the specified assembly.
         /// </summary>
@@ -31,19 +30,29 @@ namespace Swagger.Net.ResourceModels.Configuration
             {
                 var instance = Activator.CreateInstance(config);
                 s_configurations.Add((IResourceConfiguration)instance);
-            }                       
-        }        
+            }
+        }
+
+        /// <summary>
+        /// Initializes with the specified configurations.
+        /// </summary>
+        /// <param name="configs">The configurations.</param>
+        public static void Initialize(params IResourceConfiguration[] configs)
+        {
+            s_configurations = new List<IResourceConfiguration>(configs);
+        }
 
         /// <summary>
         /// Determines whether the controller (ResourceConfiguration) can be shown.
         /// </summary>
         /// <param name="controllerDescriptor">The controller descriptor.</param>
         internal static bool IsResourceMapped(HttpControllerDescriptor controllerDescriptor)
-		{
-			var result = true;
-			var config = GetResourceConfiguration (controllerDescriptor);
+        {
+            var result = true;
+            var config = GetResourceConfiguration(controllerDescriptor);
 
-			if (config != null) {
+            if (config != null)
+            {
 
                 var canShow = config.CanShow;
 
@@ -51,27 +60,28 @@ namespace Swagger.Net.ResourceModels.Configuration
                 {
                     result = canShow.Value;
                 }
-			}
+            }
 
-			return result;
-		}
+            return result;
+        }
 
         /// <summary>
         /// Determines whether the ApiDescription (OperationConfiguration) can be shown.
         /// </summary>
         /// <param name="apiDescription">The API description.</param>  
-		internal static bool IsOperationMapped(ApiDescription apiDescription)
-		{
-			var result = true;
+        internal static bool IsOperationMapped(ApiDescription apiDescription)
+        {
+            var result = true;
             var actionDescriptor = apiDescription.ActionDescriptor;
             var config = GetResourceConfiguration(actionDescriptor.ControllerDescriptor);
 
-			if (config != null) {
+            if (config != null)
+            {
                 result = config.IsOperationMapped(apiDescription.HttpMethod, apiDescription.RelativePath);
-			}
+            }
 
-			return result;
-		}
+            return result;
+        }
 
 
         /// <summary>
@@ -90,7 +100,7 @@ namespace Swagger.Net.ResourceModels.Configuration
 
             return result;
         }
-		#endregion        
+        #endregion
 
         #region Helpers
         /// <summary>
@@ -118,7 +128,7 @@ namespace Swagger.Net.ResourceModels.Configuration
                 }
                 else
                 {
-                    result = config.GetOperation(apiDescription.HttpMethod, apiDescription.RelativePath, where); 
+                    result = config.GetOperation(apiDescription.HttpMethod, apiDescription.RelativePath, where);
                 }
             }
 

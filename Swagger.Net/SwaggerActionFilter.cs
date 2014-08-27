@@ -11,6 +11,7 @@ using System;
 using System.Threading.Tasks;
 using Swagger.Net.Helpers;
 using Swagger.Net.ResourceModels.Configuration;
+using System.Net.Http.Formatting;
 
 namespace Swagger.Net
 {
@@ -75,7 +76,7 @@ namespace Swagger.Net
 
 			var response = new HttpResponseMessage();
 
-			var formatter = actionContext.ControllerContext.Configuration.Formatters.JsonFormatter;
+			var formatter = new JsonMediaTypeFormatter();
             
 			var resourceListing = GetDocs(actionContext);
 
@@ -116,8 +117,12 @@ namespace Swagger.Net
 
                     foreach (var param in api.ParameterDescriptions)
                     {
-                        ResourceApiOperationParameter parameter = SwaggerGen.CreateResourceApiOperationParameter(api, param, DocProvider);
-                        resourceApiOperation.parameters.Add(parameter);
+                        if (resourceApiOperation != null)
+                        {
+                            ResourceApiOperationParameter parameter = SwaggerGen.CreateResourceApiOperationParameter(api, param, DocProvider);
+                            resourceApiOperation.parameters.Add(parameter);
+                        }
+
                         resourceListing.Models.AddRange(SwaggerGen.CreateResourceModel(param, DocProvider));
                     }
                 }

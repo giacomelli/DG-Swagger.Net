@@ -100,6 +100,11 @@ namespace Swagger.Net.ResourceModels.Configuration
         {
             var operand = new FuncOperand((o) =>
             {
+                if (o == null)
+                {
+                    return false;
+                }
+
                 return func(o);
             });
 
